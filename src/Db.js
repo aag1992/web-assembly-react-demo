@@ -1,37 +1,22 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import initSqlJs from "sql.js";
-import { gapi } from 'gapi-script';
 
 
 import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
 
-export default function Db() {
+export default function Db(file) {
   const [db, setDb] = useState(null);
   const [error, setError] = useState(null);
 
   const fetchDatabaseFile = async () => {
     try {
-      debugger
-      if(gapi.client) {
-        const SQL = await initSqlJs({ locateFile: () => sqlWasm });
-        debugger
-        
-        // Fetch the file from Google Drive using gapi
-        const response = await gapi.client.drive.files.get({
-          fileId: "1C1yr0zTqDNNVtkQl3fYnOyUmRj9COL3F",
-          alt: "media",
-        });
-    
-        if (response.status !== 200) {
-          throw new Error("Failed to fetch database file");
-        }
-    
-        const data = new Uint8Array(response.body);
-        const loadedDb = new SQL.Database(data);
-    
-        setDb(loadedDb);
-      }
+      const SQL = await initSqlJs({ locateFile: () => sqlWasm });
+  
+
+      const loadedDb = new SQL.Database(file.file);
+  
+      setDb(loadedDb);
     } catch (err) {
       setError(err);
     }
@@ -46,7 +31,7 @@ export default function Db() {
     } catch (err) {
       setError(err);
     }
-  }, [gapi.client]);
+  }, [file]);
 
   if (error) return <pre>{error.toString()}</pre>;
   else if (!db) return <pre>Loading...</pre>;

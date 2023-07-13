@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Spin } from 'antd';
 import styled from 'styled-components';
 import { gapi } from 'gapi-script';
-import GoogleDriveImage from '../../images/google-drive.png';;
+import GoogleDriveImage from '../../images/google-drive.png';
 import ListDocuments from '../ListDocuments';
 import { style } from './styles';
 import Db from '../../Db';
@@ -25,21 +25,20 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 const SelectSource = () => {
   const [listDocumentsVisible, setListDocumentsVisibility] = useState(false);
   const [documents, setDocuments] = useState([]);
+  const [file, setFile] = useState(null);
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
   const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
   const [signedInUser, setSignedInUser] = useState();
-  const handleChange = (file) => {};
+
+  useEffect(() => {
+    handleClientLoad();
+  }, []);
 
   /**
    * Print files.
    */
   const listFiles = (searchTerm = null) => {
-    
     setIsFetchingGoogleDriveFiles(true);
-    const response =  gapi.client.drive.files.get({
-      fileId: "1C1yr0zTqDNNVtkQl3fYnOyUmRj9COL3F",
-      alt: "media",
-    });
 
     gapi.client.drive.files
       .list({
@@ -54,12 +53,24 @@ const SelectSource = () => {
         setDocuments(res.files);
       });
   };
+  
 
-  const getDB = async () => {
-    const response = await gapi.client.drive.files.get({
-      fileId: "1C1yr0zTqDNNVtkQl3fYnOyUmRj9COL3F",
+  const getDB = () => {
+    gapi.client.drive.files.get({
       alt: "media",
-    });
+      fileId: "1C1yr0zTqDNNVtkQl3fYnOyUmRj9COL3F",
+    },
+    {
+      responseType: 'blob',
+    }).then(function (response) {
+      if (response.status === 200) {
+        setFile(response.body);
+      } else {
+        console.log("Error getting file: " + response.status);
+      }
+    
+    });;
+
   };
 
   /**
@@ -78,12 +89,14 @@ const SelectSource = () => {
       // Set the signed in user
       setSignedInUser(gapi.auth2.getAuthInstance().currentUser.get());
       setIsLoadingGoogleDriveApi(false);
+      getDB();
       // list files if user is authenticated
       listFiles();
-      getDB();
     } else {
       // prompt user to sign in
       handleAuthClick();
+      getDB();
+
     }
   };
 
@@ -124,6 +137,10 @@ const SelectSource = () => {
     gapi.load('client:auth2', initClient);
   };
 
+  const handleGoogleDriveClick = () => {
+    handleClientLoad();
+  };
+
   const showDocuments = () => {
     setListDocumentsVisibility(true);
   };
@@ -134,8 +151,7 @@ const SelectSource = () => {
 
   return (
     <NewDocumentWrapper>
-      <Row gutter={16} className="custom-row">  
-        {/* <Db/> */}
+      <Row gutter={16} className="custom-row">
         <ListDocuments
           visible={listDocumentsVisible}
           onClose={onClose}
@@ -147,7 +163,8 @@ const SelectSource = () => {
         />
         <Col span={8}>
           <Spin spinning={isLoadingGoogleDriveApi} style={{ width: '100%' }}>
-            <div onClick={() => handleClientLoad()} className="source-container">
+            <Db file={file} />
+            <div onClick={handleGoogleDriveClick} className="source-container">
               <div className="icon-container">
                 <div className="icon icon-success">
                   <img height="80" width="80" src={GoogleDriveImage} />
@@ -161,6 +178,7 @@ const SelectSource = () => {
           </Spin>
         </Col>
       </Row>
+
     </NewDocumentWrapper>
   );
 };
