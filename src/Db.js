@@ -63,7 +63,7 @@ function SQLRepl({ db }) {
   return (
 
     <div className="App">
-      <h1>React SQL interpreter</h1>
+      <h1 >Drive Video Viewer</h1>
 
       <textarea
         onChange={(e) => exec(e.target.value)}

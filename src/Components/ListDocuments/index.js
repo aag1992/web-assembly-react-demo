@@ -1,9 +1,15 @@
 import React, { useCallback } from 'react';
 import moment from 'moment';
 import { debounce } from 'lodash';
-
 import { Col, Drawer, Row, Button, Input, Table, Tooltip } from 'antd';
+
 const { Search } = Input;
+
+const openVideo = (documentId) => {
+  const url = `https://drive.google.com/file/d/${documentId}?t=12`;
+  window.open(url, '_blank');
+};
+
 
 const columns = [
   {
@@ -21,10 +27,10 @@ const columns = [
     title: 'Action',
     key: 'status',
     dataIndex: 'status',
-    render: (tag) => (
+    render: (tag, record) => (
       <span>
-        <Tooltip title="View Document">
-          <Button type="primary" ghost>
+        <Tooltip title="Open Video">
+          <Button type="primary" ghost onClick={() => openVideo(record.id)}>
             Select
           </Button>
         </Tooltip>
@@ -32,19 +38,18 @@ const columns = [
     ),
   },
 ];
+
 const ListDocuments = ({ visible, onClose, documents = [], onSearch, signedInUser, onSignOut, isLoading }) => {
   const search = (value) => {
     delayedQuery(`name contains '${value}'`);
   };
 
-  const delayedQuery = useCallback(
-    debounce((q) => onSearch(q), 500),
-    []
-  );
+  const delayedQuery = useCallback(debounce((q) => onSearch(q), 500), []);
+
 
   return (
     <Drawer
-      title="Select Google Drive Document"
+      title="Select your video"
       placement="right"
       closable
       onClose={onClose}
@@ -54,7 +59,6 @@ const ListDocuments = ({ visible, onClose, documents = [], onSearch, signedInUse
       <Row gutter={16}>
         <Col span={24}>
           <div style={{ marginBottom: 20 }}>
-            <p>Signed In as: {`${signedInUser?.Ad} (${signedInUser?.zu})`}</p>
             <Button type="primary" onClick={onSignOut}>
               Sign Out
             </Button>
