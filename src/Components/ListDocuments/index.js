@@ -5,47 +5,45 @@ import { Col, Drawer, Row, Button, Input, Table, Tooltip } from 'antd';
 
 const { Search } = Input;
 
-const openVideo = (documentId) => {
-  const url = `https://drive.google.com/file/d/${documentId}?t=12`;
-  window.open(url, '_blank');
-};
-
-
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Last Modified Date',
-    dataIndex: 'modifiedTime',
-    key: 'modifiedTime',
-    render: (text) => <span>{moment(text).format('Do MMM YYYY HH:mm A')}</span>,
-  },
-  {
-    title: 'Action',
-    key: 'status',
-    dataIndex: 'status',
-    render: (tag, record) => (
-      <span>
-        <Tooltip title="Open Video">
-          <Button type="primary" ghost onClick={() => openVideo(record.id)}>
-            Select
-          </Button>
-        </Tooltip>
-      </span>
-    ),
-  },
-];
-
-const ListDocuments = ({ visible, onClose, documents = [], onSearch, signedInUser, onSignOut, isLoading }) => {
+const ListDocuments = ({ visible, setVideoSource, onClose, documents = [], onSearch, signedInUser, onSignOut, isLoading }) => {
   const search = (value) => {
     delayedQuery(`name contains '${value}'`);
   };
 
   const delayedQuery = useCallback(debounce((q) => onSearch(q), 500), []);
 
+  const openVideo = (documentId) => {
+    debugger
+    setVideoSource(`https://drive.google.com/file/d/${documentId}/preview?t=12`);
+  };
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Last Modified Date',
+      dataIndex: 'modifiedTime',
+      key: 'modifiedTime',
+      render: (text) => <span>{moment(text).format('Do MMM YYYY HH:mm A')}</span>,
+    },
+    {
+      title: 'Action',
+      key: 'status',
+      dataIndex: 'status',
+      render: (tag, record) => (
+        <span>
+          <Tooltip title="Open Video">
+            <Button type="primary" ghost onClick={() => openVideo(record.id)}>
+              Select
+            </Button>
+          </Tooltip>
+        </span>
+      ),
+    },
+  ];
 
   return (
     <Drawer

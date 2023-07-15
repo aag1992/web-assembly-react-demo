@@ -29,6 +29,7 @@ const SelectSource = () => {
   const [listDocumentsVisible, setListDocumentsVisibility] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
+  const [videoSource, setVideoSource] = useState();
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
   const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] =
     useState(false);
@@ -38,16 +39,7 @@ const SelectSource = () => {
     handleClientLoad();
   }, []);
 
-  const videoSources = [
-    {
-      src: "https://drive.google.com/file/d/1yOK0_OGX96vBGn7xMT6ffgAvtETaJIzt",
-      mimeType: "video/mp4",
-    },
-    {
-      src: "https://drive.google.com/file/d/1yOK0_OGX96vBGn7xMT6ffgAvtETaJIzt",
-      mimeType: "video/mp4",
-    },
-  ];
+
 
   const listFiles = (searchTerm = null) => {
     setIsFetchingGoogleDriveFiles(true);
@@ -135,10 +127,6 @@ const SelectSource = () => {
     handleClientLoad();
   };
 
-  const showDocuments = () => {
-    setListDocumentsVisibility(true);
-  };
-
   const onClose = () => {
     setListDocumentsVisibility(false);
   };
@@ -148,6 +136,7 @@ const SelectSource = () => {
       <Row gutter={20} className="custom-row">
         <ListDocuments
           visible={listDocumentsVisible}
+          setVideoSource={setVideoSource}
           onClose={onClose}
           documents={documents}
           onSearch={listFiles}
@@ -158,8 +147,8 @@ const SelectSource = () => {
         <Col span={10}>
           <Spin spinning={isLoadingGoogleDriveApi} style={{ width: "100%" }}>
             {/* <Db file={file} /> */}
-
-              <div onClick={handleGoogleDriveClick}>
+            <VideoPlayer source={videoSource} style={{ width: "100%" }} />
+              <div onClick={handleGoogleDriveClick} style={{ marginTop: '20px' }}>
                 <div className="icon-container">
                   <div className="icon icon-success">
                     <img height="80" width="80" src={GoogleDriveImage} />
@@ -170,7 +159,7 @@ const SelectSource = () => {
                 </div>
               </div>
 
-            <VideoPlayer sources={videoSources} style={{ width: "100%" }} />
+
           </Spin>
         </Col>
       </Row>

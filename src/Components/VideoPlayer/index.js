@@ -1,10 +1,10 @@
 import React from 'react';
 
-export default function VideoPlayer() {
+export default function VideoPlayer({source}) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <Video name="LA Airspace" source="Uber Elevate" src="https://drive.google.com/file/d/17SEyxcV99SqwepeCmQxXh_g2jZF7fq7d/preview?t=12" />
+        <Video name="LA Airspace" source="Uber Elevate" src={source} />
       </div>
     </div>
   );
