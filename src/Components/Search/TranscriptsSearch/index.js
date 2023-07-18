@@ -58,19 +58,17 @@ const TranscriptSearch = ({
     );
   };
 
+  const handleTableChange = (pagination, filters, sorter) => {
+    // Handle sorting here
+  };
+
   const columns = [
     {
       title: "Text",
       dataIndex: "text",
       key: "text",
-    },
-    {
-      title: "Last Modified Date",
-      dataIndex: "modifiedTime",
-      key: "modifiedTime",
-      render: (text) => (
-        <span>{moment(text).format("Do MMM YYYY HH:mm A")}</span>
-      ),
+      sorter: (a, b) => a.text.localeCompare(b.text),
+      // Add sortOrder if needed
     },
     {
       title: "Action",
@@ -106,6 +104,7 @@ const TranscriptSearch = ({
         dataSource={searchDocuments}
         pagination={{ simple: true }}
         loading={isLoading}
+        onChange={handleTableChange}
       />
     </div>
   );

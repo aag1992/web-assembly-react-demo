@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useEffect } from "react";
+import { Button, DatePicker, Input, Table, Tooltip } from "antd";
 import moment from "moment";
-import { Button, Input, Table, Tooltip, DatePicker } from "antd";
+import React, { useEffect, useState } from "react";
+import { queries } from "../SearchUtils/Queries";
 import QueryExecutor from "../SearchUtils/QueryExecutor";
-import { queries, textPlaceholder } from "../SearchUtils/Queries";
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
@@ -13,13 +13,15 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
   const [results, setResults] = useState(null);
   const [searchDocuments, setSearchDocuments] = useState([]);
   const [datetimeRange, setDatetimeRange] = useState([initialDate, initialDate]);
+  const [sortingColumn, setSortingColumn] = useState(null);
+  const [sortingOrder, setSortingOrder] = useState(null);
 
   const parseSearchResults = (results) => {
     return results.flatMap((result) => {
       return result.values.map((row) => {
         const [video_id, drive_id, formatted_datetime, start_time] = row;
         return {
-            video_id: video_id,
+          video_id: video_id,
           drive_id,
           start_time,
           modifiedTime: formatted_datetime,
@@ -35,7 +37,6 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
     const [startEpoch, endEpoch] = datetimeRange.map((date) =>
       date ? Math.floor(date.toDate().getTime() / 1000) : null
     );
-    debugger
 
     const dynamicQuery = queries.searchOCR
       .replace(":startEpoch", startEpoch)
@@ -61,20 +62,29 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
     );
   };
 
+  const handleTableChange = (pagination, filters, sorter) => {
+    setSortingColumn(sorter.field);
+    setSortingOrder(sorter.order);
+  };
+
   const columns = [
     {
       title: "Video Id",
       dataIndex: "video_id",
       key: "video_id",
+      sorter: (a, b) => a.video_id.localeCompare(b.video_id),
+      sortOrder: sortingColumn === "video_id" && sortingOrder,
     },
     {
-        title: "Last Modified Date",
-        dataIndex: "modifiedTime",
-        key: "modifiedTime",
-        render: (text) => (
-          <span>{moment(text * 1000).format("Do MMM YYYY HH:mm A")}</span>
-        ),
-    },      
+      title: "Last Modified Date",
+      dataIndex: "modifiedTime",
+      key: "modifiedTime",
+      render: (text) => (
+        <span>{moment(text * 1000).format("Do MMM YYYY HH:mm A")}</span>
+      ),
+      sorter: (a, b) => a.modifiedTime - b.modifiedTime,
+      sortOrder: sortingColumn === "modifiedTime" && sortingOrder,
+    },
     {
       title: "Action",
       key: "status",
@@ -99,7 +109,7 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
           format="YYYY-MM-DD HH:mm:ss"
           onChange={(value) => setDatetimeRange(value)}
           allowClear={false}
-          style={{ marginRight:"10px" }}
+          style={{ marginRight: "10px" }}
         />
         <Button
           type="primary"
@@ -115,6 +125,7 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
         dataSource={searchDocuments}
         pagination={{ simple: true }}
         loading={isLoading}
+        onChange={handleTableChange}
       />
     </div>
   );

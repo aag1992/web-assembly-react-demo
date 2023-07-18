@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import initSqlJs from 'sql.js';
 import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
-
+  
 
 const useQueryExecutor = (file, setError, setResults) => {
   const [db, setDb] = useState(null);

@@ -8,6 +8,7 @@ import { style } from "./styles";
 import VideoPlayer from "../VideoPlayer";
 import SignOutButton from "./Buttons/SignOut";
 import DateSearch from "../Search/DateSearch";
+import PeopleSearch from "../Search/PeopleSearch";
 
 const { Option } = Select;
 
@@ -177,6 +178,14 @@ const SelectSource = () => {
           )}
           {selectedSearchOption === "date" && (
             <DateSearch
+              file={file}
+              setVideoSource={setVideoSource}
+              signedInUser={signedInUser}
+              isLoading={isFetchingGoogleDriveFiles}
+            />
+          )}
+          {selectedSearchOption === "people" && (
+            <PeopleSearch
               file={file}
               setVideoSource={setVideoSource}
               signedInUser={signedInUser}
