@@ -5,7 +5,6 @@ import { gapi } from "gapi-script";
 import GoogleDriveImage from "../../images/google-drive.png";
 import ListDocuments from "../ListDocuments";
 import { style } from "./styles";
-import Db from "../../Db";
 import VideoPlayer from "../VideoPlayer";
 
 const NewDocumentWrapper = styled.div`
@@ -27,52 +26,49 @@ const SCOPES = "https://www.googleapis.com/auth/drive.metadata.readonly";
 
 const SelectSource = () => {
   const [listDocumentsVisible, setListDocumentsVisibility] = useState(false);
-  const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
   const [videoSource, setVideoSource] = useState();
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
-  const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] =
-    useState(false);
+  const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] =    useState(false);
   const [signedInUser, setSignedInUser] = useState();
 
   useEffect(() => {
     handleClientLoad();
   }, []);
 
-
-
-  const listFiles = (searchTerm = null) => {
-    setIsFetchingGoogleDriveFiles(true);
-
-    const mimeTypeQuery = "mimeType='video/mp4' or mimeType='video/quicktime'";
-
-    gapi.client.drive.files
-      .list({
+  const getDbFile = async () => {
+  
+    const query = `name='video_metadata.db' and trashed=false`;
+  
+    const response = await gapi.client.drive.files.list({
         pageSize: 10,
-        fields: "nextPageToken, files(id, name, mimeType, modifiedTime)",
-        q: `${searchTerm ? `${searchTerm} and ` : ""}(${mimeTypeQuery})`,
-      })
-      .then(function (response) {
-        setIsFetchingGoogleDriveFiles(false);
-        setListDocumentsVisibility(true);
-        const res = JSON.parse(response.body);
-        setDocuments(res.files);
+        fields: "nextPageToken, files(id)",
+        q: query,
       });
-  };
+    const res = JSON.parse(response.body);
+    setListDocumentsVisibility(true);
 
-  const getDB = () => {
+  
+        // Get the first file_id of the file named video_metadata.db
+    return res.files[0].id;
+  };
+  
+
+  const getDB = (fileId) => {
     gapi.client.drive.files
       .get(
         {
           alt: "media",
-          fileId: "1C1yr0zTqDNNVtkQl3fYnOyUmRj9COL3F",
+          fileId: fileId,
         },
         {
           responseType: "blob",
         }
       )
       .then(function (response) {
+        
         if (response.status === 200) {
+          debugger
           setFile(response.body);
         } else {
           console.log("Error getting file: " + response.status);
@@ -84,15 +80,25 @@ const SelectSource = () => {
     gapi.auth2.getAuthInstance().signIn();
   };
 
-  const updateSigninStatus = (isSignedIn) => {
+  const updateSigninStatus = async (isSignedIn) => {
+    debugger
+    setIsLoadingGoogleDriveApi(true);
+
     if (isSignedIn) {
       setSignedInUser(gapi.auth2.getAuthInstance().currentUser.get());
-      setIsLoadingGoogleDriveApi(false);
-      getDB();
-      listFiles();
+
     } else {
       handleAuthClick();
-      getDB();
+    }
+    try {
+      const file_id = await getDbFile();
+  
+      getDB(file_id);
+      setIsLoadingGoogleDriveApi(false);
+  
+    } catch (error) {
+      setIsLoadingGoogleDriveApi(false);
+      alert("Are you sure you have a DB file in your google drive ? ");
     }
   };
 
@@ -135,18 +141,16 @@ const SelectSource = () => {
     <NewDocumentWrapper>
       <Row gutter={20} className="custom-row">
         <ListDocuments
+        file={file}
           visible={listDocumentsVisible}
           setVideoSource={setVideoSource}
           onClose={onClose}
-          documents={documents}
-          onSearch={listFiles}
           signedInUser={signedInUser}
           onSignOut={handleSignOutClick}
           isLoading={isFetchingGoogleDriveFiles}
         />
         <Col span={10}>
           <Spin spinning={isLoadingGoogleDriveApi} style={{ width: "100%" }}>
-            {/* <Db file={file} /> */}
             <VideoPlayer source={videoSource} style={{ width: "100%" }} />
               <div onClick={handleGoogleDriveClick} style={{ marginTop: '20px' }}>
                 <div className="icon-container">

@@ -1,42 +1,88 @@
-import React, { useCallback } from 'react';
-import moment from 'moment';
-import { debounce } from 'lodash';
-import { Col, Drawer, Row, Button, Input, Table, Tooltip } from 'antd';
+import React, { useCallback, useState, useEffect } from "react";
+import moment from "moment";
+import { Col, Drawer, Row, Button, Input, Table, Tooltip } from "antd";
+import QueryExecutor from "./QueryExecutor";
+import { queries, textPlaceholder } from "./Queries";
 
 const { Search } = Input;
 
-const ListDocuments = ({ visible, setVideoSource, onClose, documents = [], onSearch, signedInUser, onSignOut, isLoading }) => {
-  const search = (value) => {
-    delayedQuery(`name contains '${value}'`);
+const ListDocuments = ({
+  file,
+  visible,
+  setVideoSource,
+  onClose,
+  signedInUser,
+  onSignOut,
+  isLoading,
+}) => {
+  const [error, setError] = useState(null);
+  const [results, setResults] = useState(null);
+  const [searchDocuments, setSearchDocuments] = useState([]);
+
+  const parseSearchResults = (results) => {
+    return results.flatMap((result) => {
+      return result.values.map((row) => {
+        const [drive_id, id, start_time] = row;
+        return {
+          drive_id,
+          start_time,
+          modifiedTime: moment().toISOString(),
+          name: id,
+        };
+      });
+    });
   };
 
-  const delayedQuery = useCallback(debounce((q) => onSearch(q), 500), []);
+  const { exec } = QueryExecutor(file, setError, setResults);
 
-  const openVideo = (documentId) => {
-    debugger
-    setVideoSource(`https://drive.google.com/file/d/${documentId}/preview?t=12`);
+  const search = (value) => {
+    const dynamicQuery = queries.searchTranscripts.replace(
+      textPlaceholder,
+      value
+    );
+    exec(dynamicQuery);
+  };
+
+  useEffect(() => {
+    if (results) {
+      const parsedResults = parseSearchResults(results);
+      debugger;
+      setSearchDocuments(parsedResults);
+    }
+  }, [results]);
+
+  const openVideo = (record) => {
+    const duration = moment.duration(record.start_time);
+    const milliseconds = Math.floor(duration.asMilliseconds());
+    setVideoSource(
+      `https://drive.google.com/file/d/${record.drive_id}/preview?t=${
+        milliseconds / 1000
+      }`
+    );
   };
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Last Modified Date',
-      dataIndex: 'modifiedTime',
-      key: 'modifiedTime',
-      render: (text) => <span>{moment(text).format('Do MMM YYYY HH:mm A')}</span>,
+      title: "Last Modified Date",
+      dataIndex: "modifiedTime",
+      key: "modifiedTime",
+      render: (text) => (
+        <span>{moment(text).format("Do MMM YYYY HH:mm A")}</span>
+      ),
     },
     {
-      title: 'Action',
-      key: 'status',
-      dataIndex: 'status',
+      title: "Action",
+      key: "status",
+      dataIndex: "status",
       render: (tag, record) => (
         <span>
           <Tooltip title="Open Video">
-            <Button type="primary" ghost onClick={() => openVideo(record.id)}>
+            <Button type="primary" ghost onClick={() => openVideo(record)}>
               Select
             </Button>
           </Tooltip>
@@ -77,7 +123,7 @@ const ListDocuments = ({ visible, setVideoSource, onClose, documents = [], onSea
           <Table
             className="table-striped-rows"
             columns={columns}
-            dataSource={documents}
+            dataSource={searchDocuments}
             pagination={{ simple: true }}
             loading={isLoading}
           />
