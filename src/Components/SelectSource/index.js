@@ -131,10 +131,10 @@ const SelectSource = () => {
 
   return (
     <NewDocumentWrapper>
-      <Row gutter={20} justify="center" align="middle">
+      <Row gutter={20} justify="center" align="middle" style={{ marginBottom: "10px", marginTop: "60px" }}>
         <Col span={12}>
           <Spin spinning={isLoadingGoogleDriveApi}>
-            <VideoPlayer source={videoSource} style={{ width: "100%", marginBottom: "20px" }} />
+            <VideoPlayer source={videoSource} style={{ width: "100%", marginBottom: "20px", marginTop: "40px" }} />
             <div onClick={handleGoogleDriveClick} style={{ marginTop: "20px" }}>
               <div className="icon-container">
                 <div className="icon icon-success">

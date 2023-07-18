@@ -1,10 +1,14 @@
 import React from 'react';
 
-export default function VideoPlayer({source}) {
+export default function VideoPlayer({ source }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <Video name="LA Airspace" source="Uber Elevate" src={source} />
+        {source ? (
+          <Video name="LA Airspace" source="Uber Elevate" src={source} />
+        ) : (
+          <div style={{ width: '640px', height: '360px', backgroundColor: '#000' }} />
+        )}
       </div>
     </div>
   );
@@ -17,4 +21,3 @@ function Video({ name, source, src }) {
     </div>
   );
 }
-
