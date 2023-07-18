@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Button, Row, Col, Spin } from "antd";
+import { Button, Row, Col, Spin, Select } from "antd";
 import styled from "styled-components";
 import { gapi } from "gapi-script";
 import GoogleDriveImage from "../../images/google-drive.png";
-import ListDocuments from "../ListDocuments";
+import TranscriptSearch from "../Search/TranscriptsSearch";
 import { style } from "./styles";
 import VideoPlayer from "../VideoPlayer";
 import SignOutButton from "./Buttons/SignOut";
+import DateSearch from "../Search/DateSearch";
+
+const { Option } = Select;
 
 const NewDocumentWrapper = styled.div`
   ${style}
@@ -33,6 +36,7 @@ const SelectSource = () => {
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
   const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
   const [signedInUser, setSignedInUser] = useState();
+  const [selectedSearchOption, setSelectedSearchOption] = useState("transcript");
 
   useEffect(() => {
     handleClientLoad();
@@ -129,6 +133,10 @@ const SelectSource = () => {
     setListDocumentsVisibility(false);
   };
 
+  const handleSearchOptionChange = (value) => {
+    setSelectedSearchOption(value);
+  };
+
   return (
     <NewDocumentWrapper>
       <Row gutter={20} justify="center" align="middle" style={{ marginBottom: "10px", marginTop: "60px" }}>
@@ -142,20 +150,40 @@ const SelectSource = () => {
                 </div>
               </div>
               <div className="content-container">
-                <p className="title">Search Google Drive</p>
+                <p className="title">Connect to Google Drive</p>
               </div>
             </div>
           </Spin>
         </Col>
       </Row>
-      <Row justify="center" align="middle" >
+      <Row justify="center" align="middle" style={{ marginBottom: "10px" }}>
+        <Col span={3}>
+          <Select value={selectedSearchOption} onChange={handleSearchOptionChange} style={{ width: "100%" }}>
+            <Option value="transcript">Transcript Search</Option>
+            <Option value="date">Date Search</Option>
+            <Option value="people">People Search</Option>
+          </Select>
+        </Col>
+      </Row>
+      <Row justify="center" align="middle">
         <Col span={12}>
-          <ListDocuments
-            file={file}
-            setVideoSource={setVideoSource}
-            signedInUser={signedInUser}
-            isLoading={isFetchingGoogleDriveFiles}
-          />
+          {selectedSearchOption === "transcript" && (
+            <TranscriptSearch
+              file={file}
+              setVideoSource={setVideoSource}
+              signedInUser={signedInUser}
+              isLoading={isFetchingGoogleDriveFiles}
+            />
+          )}
+          {selectedSearchOption === "date" && (
+            <DateSearch
+              file={file}
+              setVideoSource={setVideoSource}
+              signedInUser={signedInUser}
+              isLoading={isFetchingGoogleDriveFiles}
+            />
+          )}
+          {/* Render other search components based on the selectedSearchOption */}
         </Col>
       </Row>
       <Row justify="center" align="middle" style={{ marginTop: "20px" }}>

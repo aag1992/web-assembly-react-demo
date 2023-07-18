@@ -24,14 +24,11 @@ const useQueryExecutor = (file, setError, setResults) => {
     (sql) => {
       try {
         if (db) {
-          const results = db.exec(sql); // an array of objects is returned
+          const results = db.exec(sql); 
           setResults(results);
-          console.log('amitai');
-          console.log(results);
           setError(null);
         }
       } catch (err) {
-        // exec throws an error when the SQL statement is invalid
         setError(err);
         setResults([]);
       }

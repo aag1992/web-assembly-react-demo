@@ -1,12 +1,12 @@
 import React, { useCallback, useState, useEffect } from "react";
 import moment from "moment";
 import { Button, Input, Table, Tooltip } from "antd";
-import QueryExecutor from "./QueryExecutor";
-import { queries, textPlaceholder } from "./Queries";
+import QueryExecutor from "../SearchUtils/QueryExecutor"
+import { queries, textPlaceholder } from "../SearchUtils/Queries";
 
 const { Search } = Input;
 
-const ListDocuments = ({
+const TranscriptSearch = ({
   file,
   setVideoSource,
   signedInUser,
@@ -111,4 +111,4 @@ const ListDocuments = ({
   );
 };
 
-export default ListDocuments;
+export default TranscriptSearch;
