@@ -12,7 +12,6 @@ export default function Db(file) {
   const fetchDatabaseFile = async () => {
     try {
       const SQL = await initSqlJs({ locateFile: () => sqlWasm });
-  
 
       const loadedDb = new SQL.Database(file.file);
   

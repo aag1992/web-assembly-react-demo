@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import moment from "moment";
-import { Col, Drawer, Row, Button, Input, Table, Tooltip } from "antd";
+import { Button, Input, Table, Tooltip } from "antd";
 import QueryExecutor from "./QueryExecutor";
 import { queries, textPlaceholder } from "./Queries";
 
@@ -8,11 +8,8 @@ const { Search } = Input;
 
 const ListDocuments = ({
   file,
-  visible,
   setVideoSource,
-  onClose,
   signedInUser,
-  onSignOut,
   isLoading,
 }) => {
   const [error, setError] = useState(null);
@@ -22,8 +19,9 @@ const ListDocuments = ({
   const parseSearchResults = (results) => {
     return results.flatMap((result) => {
       return result.values.map((row) => {
-        const [drive_id, id, start_time] = row;
+        const [text, drive_id, id, start_time] = row;
         return {
+          text, 
           drive_id,
           start_time,
           modifiedTime: moment().toISOString(),
@@ -46,7 +44,6 @@ const ListDocuments = ({
   useEffect(() => {
     if (results) {
       const parsedResults = parseSearchResults(results);
-      debugger;
       setSearchDocuments(parsedResults);
     }
   }, [results]);
@@ -63,9 +60,9 @@ const ListDocuments = ({
 
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Text",
+      dataIndex: "text",
+      key: "text",
     },
     {
       title: "Last Modified Date",
@@ -83,7 +80,7 @@ const ListDocuments = ({
         <span>
           <Tooltip title="Open Video">
             <Button type="primary" ghost onClick={() => openVideo(record)}>
-              Select
+              Open
             </Button>
           </Tooltip>
         </span>
@@ -92,44 +89,25 @@ const ListDocuments = ({
   ];
 
   return (
-    <Drawer
-      title="Select your video"
-      placement="right"
-      closable
-      onClose={onClose}
-      visible={visible}
-      width={900}
-    >
-      <Row gutter={16}>
-        <Col span={24}>
-          <div style={{ marginBottom: 20 }}>
-            <Button type="primary" onClick={onSignOut}>
-              Sign Out
-            </Button>
-          </div>
-
-          <div className="table-card-actions-container">
-            <div className="table-search-container">
-              <Search
-                placeholder="Search Google Drive"
-                onChange={(e) => search(e.target.value)}
-                onSearch={(value) => search(value)}
-                className="table-search-input"
-                size="large"
-                enterButton
-              />
-            </div>
-          </div>
-          <Table
-            className="table-striped-rows"
-            columns={columns}
-            dataSource={searchDocuments}
-            pagination={{ simple: true }}
-            loading={isLoading}
-          />
-        </Col>
-      </Row>
-    </Drawer>
+    <div>
+      <div style={{ marginBottom: "20px" }}>
+        <Search
+          placeholder="Search your drive files"
+          onChange={(e) => search(e.target.value)}
+          onSearch={(value) => search(value)}
+          className="table-search-input"
+          size="large"
+          enterButton
+        />
+      </div>
+      <Table
+        className="table-striped-rows"
+        columns={columns}
+        dataSource={searchDocuments}
+        pagination={{ simple: true }}
+        loading={isLoading}
+      />
+    </div>
   );
 };
 
