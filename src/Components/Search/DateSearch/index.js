@@ -1,18 +1,23 @@
 import { Button, DatePicker, Input, Table, Tooltip } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat"; // Import the plugin for localized date format
+
 import React, { useEffect, useState } from "react";
 import { queries } from "../SearchUtils/Queries";
+import moment from "moment";
 import QueryExecutor from "../SearchUtils/QueryExecutor";
 
-const { Search } = Input;
-const { RangePicker } = DatePicker;
-const initialDate = moment("1993-03-17", "YYYY-MM-DD");
+dayjs.extend(localizedFormat); // Use the plugin for localized date format
+
+const initialStartDate = dayjs("1993-03-17", "YYYY-MM-DD");
+const initialEndDate = dayjs("2000-03-17", "YYYY-MM-DD");
 
 const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
   const [searchDocuments, setSearchDocuments] = useState([]);
-  const [datetimeRange, setDatetimeRange] = useState([initialDate, initialDate]);
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
   const [sortingColumn, setSortingColumn] = useState(null);
   const [sortingOrder, setSortingOrder] = useState(null);
 
@@ -34,9 +39,10 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
   const { exec } = QueryExecutor(file, setError, setResults);
 
   const search = () => {
-    const [startEpoch, endEpoch] = datetimeRange.map((date) =>
-      date ? Math.floor(date.toDate().getTime() / 1000) : null
-    );
+    const [startEpoch, endEpoch] = [
+      startDate ? Math.floor(startDate.toDate().getTime() / 1000) : null,
+      endDate ? Math.floor(endDate.toDate().getTime() / 1000) : null,
+    ];
 
     const dynamicQuery = queries.searchOCR
       .replace(":startEpoch", startEpoch)
@@ -80,7 +86,7 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
       dataIndex: "modifiedTime",
       key: "modifiedTime",
       render: (text) => (
-        <span>{moment(text * 1000).format("Do MMM YYYY HH:mm A")}</span>
+        <span>{moment(text * 1000).format("Do MMM YYYY")}</span>
       ),
       sorter: (a, b) => a.modifiedTime - b.modifiedTime,
       sortOrder: sortingColumn === "modifiedTime" && sortingOrder,
@@ -104,17 +110,25 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
   return (
     <div>
       <div style={{ marginBottom: "20px" }}>
-        <RangePicker
-          showTime
-          format="YYYY-MM-DD HH:mm:ss"
-          onChange={(value) => setDatetimeRange(value)}
+        <DatePicker
+          format="YYYY-MM-DD"
+          value={startDate}
+          onChange={setStartDate}
           allowClear={false}
           style={{ marginRight: "10px" }}
+        />
+        <span style={{ marginRight: "5px" }}>-</span>
+        <DatePicker
+          format="YYYY-MM-DD"
+          value={endDate}
+          onChange={setEndDate}
+          allowClear={false}
+          style={{ marginLeft: "10px", marginRight: "10px" }}
         />
         <Button
           type="primary"
           onClick={search}
-          disabled={!datetimeRange || isLoading}
+          disabled={!startDate || !endDate || isLoading}
         >
           Search
         </Button>

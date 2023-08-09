@@ -162,7 +162,7 @@ const SelectSource = () => {
           <Select value={selectedSearchOption} onChange={handleSearchOptionChange} style={{ width: "100%" }}>
             <Option value="transcript">Transcript Search</Option>
             <Option value="date">Date Search</Option>
-            <Option value="people">People Search</Option>
+            {/* <Option value="people">People Search</Option> */}
           </Select>
         </Col>
       </Row>
@@ -184,14 +184,14 @@ const SelectSource = () => {
               isLoading={isFetchingGoogleDriveFiles}
             />
           )}
-          {selectedSearchOption === "people" && (
+          {/* {selectedSearchOption === "people" && (
             <PeopleSearch
               file={file}
               setVideoSource={setVideoSource}
               signedInUser={signedInUser}
               isLoading={isFetchingGoogleDriveFiles}
             />
-          )}
+          )} */}
           {/* Render other search components based on the selectedSearchOption */}
         </Col>
       </Row>
