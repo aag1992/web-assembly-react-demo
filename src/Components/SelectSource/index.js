@@ -43,7 +43,7 @@ const SelectSource = () => {
     useState("transcript");
 
   useEffect(() => {
-    // handleClientLoad();
+    handleClientLoad();
   }, []);
 
   const getDbFile = async () => {
