@@ -36,7 +36,6 @@
     stroke-width: 1.2px;
   }
   
-  <!-- dash animation -->
   @-moz-keyframes dash {
     0% {
       stroke-dashoffset: 2000;
