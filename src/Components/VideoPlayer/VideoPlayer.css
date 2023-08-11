@@ -1,0 +1,117 @@
+/* page settings */
+.main{
+    text-align:center;
+    margin:50px auto;
+    width:800px;
+  }
+  .test-iframe {
+    width: 100%;
+    height: 100%;
+    top: 50px;
+  }
+  
+  /* tv settings */
+  .st0 {
+    fill: none;
+    -webkit-animation-name: dash2;
+    -webkit-animation-duration: 2.5s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-fill-mode: forwards;
+    animation: dash 2.5s linear forwards;
+    stroke-dasharray: 2200;
+    stroke-dashoffset: 0;
+    stroke: #000000;
+    stroke-miterlimit: 10;
+    stroke-width: 1.2px;
+  }
+  
+  .st1 {
+    fill: none;
+    -webkit-animation: dash2 3.5s linear forwards;
+    animation: dash2 3.5s linear forwards;
+    stroke-dasharray: 700;
+    stroke-dashoffset: 0;
+    stroke: #000000;
+    stroke-miterlimit: 10;
+    stroke-width: 1.2px;
+  }
+  
+  <!-- dash animation -->
+  @-moz-keyframes dash {
+    0% {
+      stroke-dashoffset: 2000;
+    }
+    50% {
+      stroke-dashoffset: 500;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @-webkit-keyframes dash {
+    0% {
+      stroke-dashoffset: 2000;
+    }
+    50% {
+      stroke-dashoffset: 500;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @-o-keyframes dash {
+    0% {
+      stroke-dashoffset: 2000;
+    }
+    50% {
+      stroke-dashoffset: 500;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes dash {
+    0% {
+      stroke-dashoffset: 2000;
+    }
+    50% {
+      stroke-dashoffset: 500;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @-moz-keyframes dash2 {
+    0% {
+      stroke-dashoffset: 700;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @-webkit-keyframes dash2 {
+    0% {
+      stroke-dashoffset: 700;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @-o-keyframes dash2 {
+    0% {
+      stroke-dashoffset: 700;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes dash2 {
+    0% {
+      stroke-dashoffset: 700;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
