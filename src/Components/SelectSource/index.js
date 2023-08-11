@@ -7,6 +7,7 @@ import TranscriptSearch from "../Search/TranscriptsSearch";
 import { style } from "./styles";
 import VideoPlayer from "../VideoPlayer";
 import SignOutButton from "./Buttons/SignOut";
+import SignInButton from "./Buttons/SignIn";
 import DateSearch from "../Search/DateSearch";
 import PeopleSearch from "../Search/PeopleSearch";
 
@@ -35,12 +36,14 @@ const SelectSource = () => {
   const [file, setFile] = useState(null);
   const [videoSource, setVideoSource] = useState();
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
-  const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
+  const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] =
+    useState(false);
   const [signedInUser, setSignedInUser] = useState();
-  const [selectedSearchOption, setSelectedSearchOption] = useState("transcript");
+  const [selectedSearchOption, setSelectedSearchOption] =
+    useState("transcript");
 
   useEffect(() => {
-    handleClientLoad();
+    // handleClientLoad();
   }, []);
 
   const getDbFile = async () => {
@@ -96,13 +99,16 @@ const SelectSource = () => {
       setIsLoadingGoogleDriveApi(false);
     } catch (error) {
       setIsLoadingGoogleDriveApi(false);
-      alert("Are you sure you have a DB file in your Google Drive?");
+      if (isSignedIn) {
+        alert("Are you sure you have a DB file in your Google Drive?");
+      }
     }
   };
 
   const handleSignOutClick = (event) => {
     setListDocumentsVisibility(false);
     gapi.auth2.getAuthInstance().signOut();
+    setSignedInUser(false);
   };
 
   const initClient = () => {
@@ -140,26 +146,28 @@ const SelectSource = () => {
 
   return (
     <NewDocumentWrapper>
-      <Row gutter={20} justify="center" align="middle" style={{ marginBottom: "10px", marginTop: "60px" }}>
+      <Row
+        gutter={20}
+        justify="center"
+        align="middle"
+        style={{ marginBottom: "10px", marginTop: "60px" }}
+      >
         <Col span={12}>
           <Spin spinning={isLoadingGoogleDriveApi}>
-            <VideoPlayer source={videoSource} style={{ width: "100%", marginBottom: "20px", marginTop: "40px" }} />
-            <div onClick={handleGoogleDriveClick} style={{ marginTop: "20px" }}>
-              <div className="icon-container">
-                <div className="icon icon-success">
-                  <img height="80" width="80" src={GoogleDriveImage} alt="Google Drive" />
-                </div>
-              </div>
-              <div className="content-container">
-                <p className="title">Connect to Google Drive</p>
-              </div>
-            </div>
+            <VideoPlayer
+              source={videoSource}
+              style={{ width: "100%", marginBottom: "20px", marginTop: "40px" }}
+            />
           </Spin>
         </Col>
       </Row>
       <Row justify="center" align="middle" style={{ marginBottom: "10px" }}>
         <Col span={3}>
-          <Select value={selectedSearchOption} onChange={handleSearchOptionChange} style={{ width: "100%" }}>
+          <Select
+            value={selectedSearchOption}
+            onChange={handleSearchOptionChange}
+            style={{ width: "100%" }}
+          >
             <Option value="transcript">Transcript Search</Option>
             <Option value="date">Date Search</Option>
             {/* <Option value="people">People Search</Option> */}
@@ -197,7 +205,11 @@ const SelectSource = () => {
       </Row>
       <Row justify="center" align="middle" style={{ marginTop: "20px" }}>
         <Col>
-          <SignOutButton onSignOut={handleSignOutClick} />
+          {signedInUser ? (
+            <SignOutButton onSignOut={handleSignOutClick} />
+          ) : (
+            <SignInButton onSignIn={handleGoogleDriveClick} />
+          )}
         </Col>
       </Row>
     </NewDocumentWrapper>
