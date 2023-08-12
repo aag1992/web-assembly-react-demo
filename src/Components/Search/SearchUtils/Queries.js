@@ -16,9 +16,10 @@ export const queries = {
       AND o.formatted_datetime BETWEEN :startEpoch AND :endEpoch
   `,
   searchFaces: `
-  SELECT  f.face_name, f.video_id , v.drive_id, fi.start_time 
+  SELECT  f.face_name,f.id, f.video_id , v.drive_id, fi.start_time 
   FROM faces f
   JOIN face_instances fi ON f.id = fi.face_id
   JOIN videos v ON f.video_id = v.id
   WHERE LOWER(f.face_name) LIKE '%USER_SEARCH_TEXT%'`,
+  updateFace: `UPDATE faces set face_name  = ':userInput' where id  =:faceId and video_id =  ':videoId'`,
 };

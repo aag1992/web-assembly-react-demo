@@ -20,9 +20,10 @@ const PeopleSearch = ({
   const parseSearchResults = (results) => {
     return results.flatMap((result) => {
       return result.values.map((row) => {
-        const [face_name, video_id, drive_id, start_time] = row;
+        const [face_name,id, video_id, drive_id, start_time] = row;
         return {
           face_name,
+          face_id: id,
           drive_id,
           start_time,
           modifiedTime: moment().toISOString(),
@@ -67,6 +68,16 @@ const PeopleSearch = ({
       setFilteredDocuments(searchDocuments);
     }
   };
+
+  const handleInputChange = (e, record) => {
+    const dynamicQuery = queries.updateFace
+    .replace(":faceId", record.face_id)
+    .replace(":videoId", record.video_id)
+    .replace(":userInput", e.target.value);
+  exec(dynamicQuery);
+
+  };
+
   
   const openThumbnail = (record) => {
     const duration = moment.duration(record.start_time);
@@ -115,7 +126,7 @@ const PeopleSearch = ({
             <Button
               type="primary"
               ghost
-              onClick={() => openThumbnail(record)}
+              onClick={() => openVideo(record)}
             >
               Open
             </Button>
@@ -129,11 +140,12 @@ const PeopleSearch = ({
       dataIndex: "status",
       render: (tag, record) => (
         <span>
-          <Tooltip title="Open Video">
-            <Button type="primary" ghost onClick={() => openVideo(record)}>
-              Open
-            </Button>
-          </Tooltip>
+          <Input
+          placeholder="Alter person name"
+          value={tag}
+          onBlur={(e) => handleInputChange(e, record)}
+          size="large"
+        />
         </span>
       ),
     },
