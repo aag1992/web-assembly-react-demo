@@ -12,6 +12,7 @@ import DateSearch from "../Search/DateSearch";
 import PeopleSearch from "../Search/PeopleSearch";
 
 const { Option } = Select;
+import SubmitButton from "./Buttons/SubmitButton";
 
 const NewDocumentWrapper = styled.div`
   ${style}
@@ -136,6 +137,29 @@ const SelectSource = () => {
     handleClientLoad();
   };
 
+  const handleGoogleDriveUpdate = async () => {
+    try {
+  
+      debugger
+      // Retrieve the updated database content using the exportDatabase function
+      const updatedDatabaseContent = queryExecutor.exportDatabase();
+  
+  
+      // Update the file content on Google Drive
+      await drive.files.update({
+        fileId: fileId,
+        media: {
+          mimeType: "application/octet-stream",
+          body: updatedDatabaseContent,
+        },
+      });
+  
+      console.log("File updated successfully!");
+    } catch (error) {
+      console.error("Error updating file:", error);
+    }
+  };
+    
   const onClose = () => {
     setListDocumentsVisibility(false);
   };
@@ -210,6 +234,9 @@ const SelectSource = () => {
           ) : (
             <SignInButton onSignIn={handleGoogleDriveClick} />
           )}
+        </Col>
+        <SubmitButton onSubmit={handleGoogleDriveUpdate}/>
+        <Col>
         </Col>
       </Row>
     </NewDocumentWrapper>

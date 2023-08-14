@@ -20,6 +20,14 @@ const useQueryExecutor = (file, setError, setResults) => {
     fetchDatabaseFile();
   }, [fetchDatabaseFile]);
 
+  const exportDatabase = () => {
+    if (db) {
+      const dbContent = db.export();
+      return new Uint8Array(dbContent);
+    }
+    return null;
+  };
+
   const exec = useCallback(
     (sql) => {
       try {
