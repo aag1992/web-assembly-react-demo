@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Button, Row, Col, Spin, Select } from "antd";
-import styled from "styled-components";
+import { Col, Row, Select, Spin } from "antd";
 import { gapi } from "gapi-script";
-import GoogleDriveImage from "../../images/google-drive.png";
-import TranscriptSearch from "../Search/TranscriptsSearch";
-import { style } from "./styles";
-import VideoPlayer from "../VideoPlayer";
-import SignOutButton from "./Buttons/SignOut";
-import SignInButton from "./Buttons/SignIn";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import DateSearch from "../Search/DateSearch";
 import PeopleSearch from "../Search/PeopleSearch";
-import QueryExecutor from "../Search/SearchUtils/QueryExecutor"
-const { Option } = Select;
+import QueryExecutor from "../Search/SearchUtils/QueryExecutor";
+import TranscriptSearch from "../Search/TranscriptsSearch";
+import VideoPlayer from "../VideoPlayer";
+import SignInButton from "./Buttons/SignIn";
+import SignOutButton from "./Buttons/SignOut";
 import SubmitButton from "./Buttons/SubmitButton";
+import { style } from "./styles";
+const { Option } = Select;
 
 const NewDocumentWrapper = styled.div`
   ${style}
@@ -35,6 +34,8 @@ const SCOPES =
 const SelectSource = () => {
   const [listDocumentsVisible, setListDocumentsVisibility] = useState(false);
   const [file, setFile] = useState(null);
+  const [fileId, setFileId] = useState(null);
+
   const [videoSource, setVideoSource] = useState();
   const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
   const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] =
@@ -52,7 +53,7 @@ const SelectSource = () => {
     const query = `name='video_metadata.db' and trashed=false`;
     const response = await gapi.client.drive.files.list({
       pageSize: 10,
-      fields: "nextPageToken, files(id)",
+      fields: "nextPageToken, files(id, createdTime)",
       q: query,
     });
     const res = JSON.parse(response.body);
@@ -98,6 +99,7 @@ const SelectSource = () => {
     try {
       const file_id = await getDbFile();
       getDB(file_id);
+      setFileId(file_id);
       setIsLoadingGoogleDriveApi(false);
     } catch (error) {
       setIsLoadingGoogleDriveApi(false);
@@ -140,19 +142,20 @@ const SelectSource = () => {
 
   const handleGoogleDriveUpdate = async () => {
     try {
+      debugger
       // Retrieve the updated database content using the exportDatabase function
       const updatedDatabaseContent = queryExecutor.exportDatabase();
 
-      // Update the file content on Google Drive
-      await drive.files.update({
-        fileId: fileId,
+      const file = {
+        name: "video_metadata.db",
+        mimeType: "application/octet-stream",
         media: {
-          mimeType: "application/octet-stream",
           body: updatedDatabaseContent,
         },
-      });
+      };
+      // const response = await gapi.client.drive.files.create({ body: file });
 
-      console.log("File updated successfully!");
+      console.log("File created successfully!");
     } catch (error) {
       console.error("Error updating file:", error);
     }

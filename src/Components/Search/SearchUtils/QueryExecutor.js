@@ -42,7 +42,7 @@ const useQueryExecutor = (file) => {
     [db]
   );
 
-  return {  exec };
+  return {  exec, exportDatabase };
 };
 
 export default useQueryExecutor;
