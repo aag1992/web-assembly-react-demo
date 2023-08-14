@@ -1,19 +1,22 @@
-import { Button, DatePicker, Input, Table, Tooltip } from "antd";
+import { Button, DatePicker, Table, Tooltip } from "antd";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat"; // Import the plugin for localized date format
 
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { queries } from "../SearchUtils/Queries";
-import moment from "moment";
-import QueryExecutor from "../SearchUtils/QueryExecutor";
 
 dayjs.extend(localizedFormat); // Use the plugin for localized date format
 
 const initialStartDate = dayjs("1993-03-17", "YYYY-MM-DD");
 const initialEndDate = dayjs("2000-03-17", "YYYY-MM-DD");
 
-const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
-  const [error, setError] = useState(null);
+const DateSearch = ({
+  queryExecutor,
+  setVideoSource,
+  signedInUser,
+  isLoading,
+}) => {
   const [results, setResults] = useState(null);
   const [searchDocuments, setSearchDocuments] = useState([]);
   const [startDate, setStartDate] = useState(initialStartDate);
@@ -36,8 +39,6 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
     });
   };
 
-  const { exec } = QueryExecutor(file, setError, setResults);
-
   const search = () => {
     const [startEpoch, endEpoch] = [
       startDate ? Math.floor(startDate.toDate().getTime() / 1000) : null,
@@ -48,7 +49,7 @@ const DateSearch = ({ file, setVideoSource, signedInUser, isLoading }) => {
       .replace(":startEpoch", startEpoch)
       .replace(":endEpoch", endEpoch);
 
-    exec(dynamicQuery);
+    setResults(queryExecutor.exec(dynamicQuery));
   };
 
   useEffect(() => {

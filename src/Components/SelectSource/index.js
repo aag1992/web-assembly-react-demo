@@ -10,7 +10,7 @@ import SignOutButton from "./Buttons/SignOut";
 import SignInButton from "./Buttons/SignIn";
 import DateSearch from "../Search/DateSearch";
 import PeopleSearch from "../Search/PeopleSearch";
-
+import QueryExecutor from "../Search/SearchUtils/QueryExecutor"
 const { Option } = Select;
 import SubmitButton from "./Buttons/SubmitButton";
 
@@ -42,6 +42,7 @@ const SelectSource = () => {
   const [signedInUser, setSignedInUser] = useState();
   const [selectedSearchOption, setSelectedSearchOption] =
     useState("transcript");
+  const queryExecutor  = QueryExecutor(file);
 
   useEffect(() => {
     handleClientLoad();
@@ -139,12 +140,9 @@ const SelectSource = () => {
 
   const handleGoogleDriveUpdate = async () => {
     try {
-  
-      debugger
       // Retrieve the updated database content using the exportDatabase function
       const updatedDatabaseContent = queryExecutor.exportDatabase();
-  
-  
+
       // Update the file content on Google Drive
       await drive.files.update({
         fileId: fileId,
@@ -153,13 +151,13 @@ const SelectSource = () => {
           body: updatedDatabaseContent,
         },
       });
-  
+
       console.log("File updated successfully!");
     } catch (error) {
       console.error("Error updating file:", error);
     }
   };
-    
+
   const onClose = () => {
     setListDocumentsVisibility(false);
   };
@@ -202,7 +200,7 @@ const SelectSource = () => {
         <Col span={12}>
           {selectedSearchOption === "transcript" && (
             <TranscriptSearch
-              file={file}
+              queryExecutor={queryExecutor}
               setVideoSource={setVideoSource}
               signedInUser={signedInUser}
               isLoading={isFetchingGoogleDriveFiles}
@@ -210,7 +208,7 @@ const SelectSource = () => {
           )}
           {selectedSearchOption === "date" && (
             <DateSearch
-              file={file}
+              queryExecutor={queryExecutor}
               setVideoSource={setVideoSource}
               signedInUser={signedInUser}
               isLoading={isFetchingGoogleDriveFiles}
@@ -218,7 +216,7 @@ const SelectSource = () => {
           )}
           {selectedSearchOption === "people" && (
             <PeopleSearch
-              file={file}
+              queryExecutor={queryExecutor}
               setVideoSource={setVideoSource}
               signedInUser={signedInUser}
               isLoading={isFetchingGoogleDriveFiles}
@@ -235,9 +233,8 @@ const SelectSource = () => {
             <SignInButton onSignIn={handleGoogleDriveClick} />
           )}
         </Col>
-        <SubmitButton onSubmit={handleGoogleDriveUpdate}/>
-        <Col>
-        </Col>
+        <SubmitButton onSubmit={handleGoogleDriveUpdate} />
+        <Col></Col>
       </Row>
     </NewDocumentWrapper>
   );

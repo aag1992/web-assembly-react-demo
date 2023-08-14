@@ -1,13 +1,12 @@
-import React, { useCallback, useState, useEffect } from "react";
-import moment from "moment";
 import { Button, Input, Table, Tooltip } from "antd";
-import QueryExecutor from "../SearchUtils/QueryExecutor"
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { queries, textPlaceholder } from "../SearchUtils/Queries";
 
 const { Search } = Input;
 
 const TranscriptSearch = ({
-  file,
+  queryExecutor,
   setVideoSource,
   signedInUser,
   isLoading,
@@ -21,7 +20,7 @@ const TranscriptSearch = ({
       return result.values.map((row) => {
         const [text, drive_id, id, start_time] = row;
         return {
-          text, 
+          text,
           drive_id,
           start_time,
           modifiedTime: moment().toISOString(),
@@ -31,14 +30,12 @@ const TranscriptSearch = ({
     });
   };
 
-  const { exec } = QueryExecutor(file, setError, setResults);
-
   const search = (value) => {
     const dynamicQuery = queries.searchTranscripts.replace(
       textPlaceholder,
       value
     );
-    exec(dynamicQuery);
+    setResults(queryExecutor.exec(dynamicQuery));
   };
 
   useEffect(() => {

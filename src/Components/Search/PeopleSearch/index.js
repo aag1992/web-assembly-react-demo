@@ -1,18 +1,16 @@
-import React, { useCallback, useState, useEffect } from "react";
-import moment from "moment";
 import { Button, Input, Table, Tooltip } from "antd";
-import QueryExecutor from "../SearchUtils/QueryExecutor";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { queries, textPlaceholder } from "../SearchUtils/Queries";
 
 const { Search } = Input;
 
 const PeopleSearch = ({
-  file,
+  queryExecutor,
   setVideoSource,
   signedInUser,
   isLoading,
 }) => {
-  const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
   const [searchDocuments, setSearchDocuments] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
@@ -20,7 +18,7 @@ const PeopleSearch = ({
   const parseSearchResults = (results) => {
     return results.flatMap((result) => {
       return result.values.map((row) => {
-        const [face_name,id, video_id, drive_id, start_time] = row;
+        const [face_name, id, video_id, drive_id, start_time] = row;
         return {
           face_name,
           face_id: id,
@@ -33,11 +31,9 @@ const PeopleSearch = ({
     });
   };
 
-  const { exec } = QueryExecutor(file, setError, setResults);
-
   const search = (value) => {
     const dynamicQuery = queries.searchFaces.replace(textPlaceholder, value);
-    exec(dynamicQuery);
+    setResults(queryExecutor.exec(dynamicQuery));
   };
 
   useEffect(() => {
@@ -71,18 +67,18 @@ const PeopleSearch = ({
 
   const handleInputChange = (e, record) => {
     const dynamicQuery = queries.updateFace
-    .replace(":faceId", record.face_id)
-    .replace(":videoId", record.video_id)
-    .replace(":userInput", e.target.value);
-  exec(dynamicQuery);
-
+      .replace(":faceId", record.face_id)
+      .replace(":videoId", record.video_id)
+      .replace(":userInput", e.target.value);
+    queryExecutor.exec(dynamicQuery);
   };
 
-  
   const openThumbnail = (record) => {
     const duration = moment.duration(record.start_time);
     const milliseconds = Math.floor(duration.asMilliseconds());
-    const thumbnailUrl = `https://drive.google.com/thumbnail?id=${record.drive_id}&t=${milliseconds / 1000}`;
+    const thumbnailUrl = `https://drive.google.com/thumbnail?id=${
+      record.drive_id
+    }&t=${milliseconds / 1000}`;
     window.open(thumbnailUrl, "_blank");
   };
 
@@ -123,11 +119,7 @@ const PeopleSearch = ({
       render: (text, record) => (
         <span>
           <Tooltip title="Open Thumbnail">
-            <Button
-              type="primary"
-              ghost
-              onClick={() => openVideo(record)}
-            >
+            <Button type="primary" ghost onClick={() => openVideo(record)}>
               Open
             </Button>
           </Tooltip>
@@ -141,16 +133,15 @@ const PeopleSearch = ({
       render: (tag, record) => (
         <span>
           <Input
-          placeholder="Alter person name"
-          value={tag}
-          onBlur={(e) => handleInputChange(e, record)}
-          size="large"
-        />
+            placeholder="Alter person name"
+            value={tag}
+            onBlur={(e) => handleInputChange(e, record)}
+            size="large"
+          />
         </span>
       ),
     },
   ];
-  
 
   return (
     <div>

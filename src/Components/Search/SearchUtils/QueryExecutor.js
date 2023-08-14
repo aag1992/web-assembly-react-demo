@@ -3,7 +3,7 @@ import initSqlJs from 'sql.js';
 import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
   
 
-const useQueryExecutor = (file, setError, setResults) => {
+const useQueryExecutor = (file) => {
   const [db, setDb] = useState(null);
 
   const fetchDatabaseFile = useCallback(async () => {
@@ -12,7 +12,7 @@ const useQueryExecutor = (file, setError, setResults) => {
       const loadedDb = new SQL.Database(file);
       setDb(loadedDb);
     } catch (err) {
-      setError(err);
+      console.log("error occured")
     }
   }, [file]);
 
@@ -33,12 +33,10 @@ const useQueryExecutor = (file, setError, setResults) => {
       try {
         if (db) {
           const results = db.exec(sql); 
-          setResults(results);
-          setError(null);
+          return results;
         }
       } catch (err) {
-        setError(err);
-        setResults([]);
+        console.log("error occured")
       }
     },
     [db]
