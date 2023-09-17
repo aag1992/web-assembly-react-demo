@@ -195,7 +195,7 @@ const SelectSource = () => {
           >
             <Option value="transcript">Transcript Search</Option>
             <Option value="date">Date Search</Option>
-            <Option value="people">People Search</Option>
+            {/* <Option value="people">People Search</Option> */}
           </Select>
         </Col>
       </Row>
@@ -236,7 +236,7 @@ const SelectSource = () => {
             <SignInButton onSignIn={handleGoogleDriveClick} />
           )}
         </Col>
-        <SubmitButton onSubmit={handleGoogleDriveUpdate} />
+        {/* <SubmitButton onSubmit={handleGoogleDriveUpdate} /> */}
         <Col></Col>
       </Row>
     </NewDocumentWrapper>
